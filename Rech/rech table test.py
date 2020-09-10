@@ -16,34 +16,56 @@ def get_html(url):
     return r.text
 
 
-data = '''
-<td class="cover" valign="top">
-<a href="/upload/iblock/ea7/ea72966465cde6ae6674321dcd95d1af.jpg" rel="lightbox"><img alt="Пьесы" src="/upload/iblock/ea7/ea72966465cde6ae6674321dcd95d1af.jpg" title="Пьесы"/></a>
-</td>
-'''
-
-
-def get_dt(html):
+def get_dt(html, name):
     soup = BeautifulSoup(html, 'lxml')
     a = soup.findAll('table')[1].findAll('tr')
+    insides = []
+    title = ''
+    pages = 0
+    size = ''
+    cover = ''
+    isbn = ''
+    description = ''
     for tr in range(len(a)):
         b = a[tr].findAll('td')
         for td in range(len(b)):
             if tr == 0 and td == 0:
                 for d in b[td].find_all('a', href=True):
-                    front_page = d['href']
-            # TODO ADD INFO PARSING
+                    insides.append(d['href'])
             elif tr == 0 and td == 1:
-                print(b[td])
                 for d in b[td].find_all('h1'):
                     title = d.text.strip()
+                e = b[td].find('div', class_='left').text.strip()
+                e = e.replace('  ', '').replace('\t', '')
+                ee = e.split('\n')
+                for eee in ee:
+                    if 'Объем: ' in eee:
+                        pages = (eee[eee.find('Объем: ') + len('Объем: '):])
+                    elif 'Формат: ' in eee:
+                        size = (eee[eee.find('Формат: ') + len('Формат: '):])
+                    elif 'Тип переплета: ' in eee:
+                        cover = (eee[eee.find('Тип переплета: ') + len('Тип переплета: '):])
+                    elif 'ISBN: ' in eee:
+                        isbn = (eee[eee.find('ISBN: ') + len('ISBN: '):])
+                    else:
+                        pass
             elif tr == 1 and td == 0:
-                images = []
                 for d in b[td].find_all('img'):
-                    images.append(d.get('src'))
+                    insides.append(d.get('src'))
             elif tr == 1 and td == 1:
                 description = b[td].text.strip()
                 description = empty_lines(description)
+    print(title)
+    print(pages)
+    print(cover)
+    print(size)
+    print(isbn)
+    print(description)
+    # data = {'title': title, 'pages': pages, 'cover': cover, 'size': size, 'isbn': isbn, 'desc': description}
+    for i in range(len(insides)):
+        Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/rech/{name}').mkdir(parents=True, exist_ok=True)
+        urlb.urlretrieve(f'http://www.rech-deti.ru/{insides[i]}', f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser'
+                                                                  f'/images/rech/{name}/{i}.jpg')
 
 
 def get_dt2(html):
@@ -57,5 +79,9 @@ def get_dt3(html):
         print(a['href'])
 
 
-link = 'http://www.rech-deti.ru/catalog/7/61021/'
-get_dt(get_html(link))
+links = ['http://www.rech-deti.ru/catalog/7/61868/', 'http://www.rech-deti.ru/catalog/7/61866/',
+         'http://www.rech-deti.ru/catalog/7/65642/', 'http://www.rech-deti.ru/catalog/7/61868/']
+names = ['bk01', 'bk02', 'bk03', 'bk04']
+for i in range(0, 1):
+    get_dt(get_html(links[i]), names[i])
+    print(f'Done {i} \n')
