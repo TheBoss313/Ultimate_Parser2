@@ -77,11 +77,3 @@ def get_dt3(html):
     soup = BeautifulSoup(html, 'lxml')
     for a in soup.find_all('a', href=True):
         print(a['href'])
-
-
-links = ['http://www.rech-deti.ru/catalog/7/61868/', 'http://www.rech-deti.ru/catalog/7/61866/',
-         'http://www.rech-deti.ru/catalog/7/65642/', 'http://www.rech-deti.ru/catalog/7/61868/']
-names = ['bk01', 'bk02', 'bk03', 'bk04']
-for i in range(0, 1):
-    get_dt(get_html(links[i]), names[i])
-    print(f'Done {i} \n')
