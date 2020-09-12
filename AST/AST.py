@@ -1,47 +1,12 @@
-from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox as ms
 import urllib.request as urlb
 import urllib as urlb1
-from pathlib import Path
-from bs4 import BeautifulSoup
-import requests
 import csv
+from basic_parser_funcs import *
 
-t = Tk()
-t.title('AST Parser')
-t.resizable(False, False)
-filename_name = ''
-filename = Label(t, text='NO FILE SELECTED')
-y = 1
-codes = []
-names = []
-errors = []
-text = IntVar()
-img = IntVar()
 rus_l = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 eng_l = 'abcdefghijklmnopqrstuvwxyz'
 eng = ['a', 'b', 'v', 'g', 'd', 'e', 'ye', 'zh', 'z', 'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f',
        'kh', 'ts', 'ch', 'sh', 'shch', '', 'y', '', 'e', 'yu', 'ya']
-
-
-def log_write(status, name, code, **kwargs):
-    """
-    Function that creates a log file
-    :param status: What Happened
-    :param name: Book Name
-    :param code: book AST or ASE code
-    :param kwargs: link
-    :return: ads the event into a log file
-    """
-    link = kwargs.get('link', None)
-    with open('ast.csv', 'a', encoding='utf8') as logs:
-        log = csv.writer(logs)
-        if link != '':
-            log.writerow((status, code, name))
-        else:
-            log.writerow((status, code, name, link))
-    logs.close()
 
 
 # Gets images and PDF
@@ -56,16 +21,16 @@ def get_images(code: str, name1: str):
         urlb.urlretrieve(front_cover, f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/ast/{name}/{name}{x}.jpg')
         x += 1
     except urlb1.error.HTTPError:
-        log_write("No Front Cover For You :'(", name1[:len(name1) - 1], code)
+        log_file("No Front Cover For You :'(", name1[:len(name1) - 1])
     try:
         urlb.urlretrieve(back_cover, f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/ast/{name}/{name}{x}.jpg')
         x += 1
     except urlb1.error.HTTPError:
-        log_write("No Back Cover For You :'(", name1[:len(name1)-1], code)
+        log_file("No Back Cover For You :'(", name1[:len(name1)-1])
     try:
         urlb.urlretrieve(pdf, f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/ast/{name}/{name}{x}.pdf')
     except urlb1.error.HTTPError:
-        log_write("No PDF For You :'(", name1[:len(name1)-1], code)
+        log_file("No PDF For You :'(", name1[:len(name1)-1])
         return
 
 
@@ -93,18 +58,6 @@ def translit_name(name: str):
     return end_name
 
 
-# Loads file
-def Loadfile():
-    global isbns, filename, filename_name
-    filename1 = filedialog.Open(t, filetypes=[('*.txt files', '.txt')]).show()
-    if filename1 == '':
-        return
-    filename2 = Path(filename1)
-    filename.config(text=filename2.name)
-    filename_name = filename1
-    log_write('File Load Successful', filename2.name, '')
-
-
 # Writes the info into CSV file
 def csv_read(data):
     with open("ast_parsed.csv", 'a', encoding="utf-8")as file:
@@ -112,22 +65,14 @@ def csv_read(data):
         writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['weight'], data['annotation']))
 
 
-# Gets the HTML from URL
-def get_html(url):
-    r = requests.get(url)
-    r.encoding = 'utf8'
-    log_write('Html Loading Successful', url, '')
-    return r.text
-
-
 # Gets the info from soup
-def get_head(html, name, code, link):
+def get_head(html, name, link):
     soup = BeautifulSoup(html, 'lxml')
     title = ''
     try:
         title = soup.select('h1.book-detail__title')[0].text.strip()
     except IndexError:
-        log_write('ERROR 404 In Text Parse', name[:len(name)-1], code, link=link)
+        log_file('ERROR 404 In Text Parse', name[:len(name)-1], link=link)
         return
     page_num1 = soup.find('div', class_='cover-info__text').get_text()
     page_num1 = page_num1.replace(' ', '')
@@ -154,72 +99,41 @@ def get_head(html, name, code, link):
         description = description.replace('\n', '')
         description = description.replace('\t ', '\t')
     except AttributeError:
-        log_write('No description for you I guess...', name, code, link=link)
+        log_file('No description for you I guess...', name, link=link)
         data = {'title': title, 'pagen': page_num, 'ISBN': isbn, 'size': size}
     else:
         data = {'title': title, 'pagen': page_num, 'ISBN': isbn, 'size': size, 'annotation': description}
     csv_read(data)
-    log_write('Text Parsed', name[:len(name)-1], code)
+    log_file('Text Parsed', name[:len(name)-1])
 
 
-# Returns textimg text img depending on checked CheckButtons
-def get_button_info():
-    global text, img
-    strong = ''
-    if text.get() == 1:
-        strong = strong + 'text'
-    if img.get() == 1:
-        strong = strong + 'img'
-    if strong == '':
-        ms.showerror('NO OPTION SELECTED', 'PLEASE SELECT TEXT, IMAGES OR BOTH!')
-        return 'ERROR'
-    return strong
-
-
-def main():
-    global y
+def ast(filename, text_image):
     # Gets info from file
-    with open(filename_name, 'r', encoding='utf8') as file:
+    with open(filename, 'r', encoding='utf8') as file:
         lines = file.readlines()
     file.close()
+    codes = []
+    names = []
     for i in lines:
         sub_tot = i.split(',', 1)
         codes.append(sub_tot[0])
         names.append(sub_tot[1])
-        print(sub_tot[1])
     # Checks what is needed
-    if get_button_info() == 'textimg':
+    if text_image == 'textimg':
         for j in range(len(names)):
             code = codes[j]
             name = names[j]
             link = f'https://ast.ru/book/{translit_name(name)}-{code[len(code) - 6:]}/'
-            print(f'{link} {y}')
-            y += 1
-            get_head(get_html(link), name, code, link)
+            get_head(get_html(link, name), name, link)
             get_images(code, name)
-    elif get_button_info() == 'text':
+    elif text_image == 'text':
         for j in range(len(names)):
             code = codes[j]
             name = names[j]
             link = f'https://ast.ru/book/{translit_name(name)}-{code[len(code) - 6:]}/'
-            print(f'{link} {y}')
-            get_head(get_html(link), name, code, link)
-    elif get_button_info() == 'img':
+            get_head(get_html(link, name), name, link)
+    elif text_image == 'img':
         for j in range(len(names)):
             code = codes[j]
             name = names[j]
-            print(y)
             get_images(code, name)
-
-
-load_btn = Button(text='Load file', command=Loadfile)
-text_check = Checkbutton(text='Text Part', variable=text, onvalue=1, offvalue=0)
-img_check = Checkbutton(text='Image Part', variable=img, onvalue=1, offvalue=0)
-go_btn = Button(text='Go!', command=main)
-filename.grid(row=0, column=0)
-load_btn.grid(row=0, column=1)
-text_check.grid(row=1, column=1)
-img_check.grid(row=2, column=1)
-go_btn.grid(row=3, column=3)
-
-t.mainloop()

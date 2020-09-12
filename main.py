@@ -2,11 +2,17 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox as ms
 from basic_parser_funcs import *
-from ROSMAN.ROSMEN import *
+from ROSMAN.ROSMEN import rosman
+from AST.AST import ast
+from EKSMO.EKSMO import eksmo
 
 # Important Variables
 filename = ''
-done = ['ROSMAN']
+done = ['ROSMAN', 'AST', 'EKSMO']
+format_descriptions = {'ROSMAN': '',
+                       'AST': 'Format:\n{AST/ASE code},{Book Name}',
+                       'EKSMO': 'Format:\n{AST/ASE code},{Book Name}'
+                       }
 
 
 # Returns textimg text img depending on checked CheckButtons
@@ -28,6 +34,10 @@ def ultra_main():
     publisher_use = publisher.get()
     if publisher_use == 'ROSMAN':
         rosman(filename, text_image)
+    elif publisher_use == 'AST':
+        ast(filename, text_image)
+    elif publisher_use == 'EKSMO':
+        eksmo(filename, text_image)
 
 
 def load():

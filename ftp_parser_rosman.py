@@ -13,7 +13,6 @@ def parse(num_first: int, name, num: int = 4):
         .mkdir(parents=True, exist_ok=True)
 
     for i in range(num):
-        print(f'ftp://rosmanpictures@ftp.rosman.ru/{str(num_first + i)}.jpg')
         try:
             urlb.urlretrieve(f'ftp://rosmanpictures@ftp.rosman.ru/{num_first + i}.jpg',
                              f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/r_ftp/'
@@ -49,6 +48,5 @@ def translit_name(name: str):
 def main_ftp(lines):
     for line in lines:
         code = line.split(',', 1)[0].lower().replace('.jpg', '').replace('ftp://rosmanpictures@ftp.rosman.ru/', '')
-        print(code)
         name = line.split(',', 1)[1]
         parse(int(code), name, 4)

@@ -1,13 +1,6 @@
-from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox as ms
-from pathlib import Path
-from bs4 import BeautifulSoup
-import requests
 import csv
 from basic_parser_funcs import *
 from ftp_parser_rosman import main_ftp
-from URL_Validator import test_url
 
 rus_l = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 eng_l = 'abcdefghijklmnopqrstuvwxyz'
