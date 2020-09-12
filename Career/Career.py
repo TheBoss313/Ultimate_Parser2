@@ -1,38 +1,11 @@
-from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox as ms
 import urllib.request as urlb
-import urllib as urlb1
-from pathlib import Path
-from bs4 import BeautifulSoup
-import requests
 import csv
+from basic_parser_funcs import *
 
-t = Tk()
-t.title('Careera Press Parser')
-t.resizable(False, False)
-filename_name = ''
-filename = Label(t, text='NO FILE SELECTED')
-y = 1
-names = []
-errors = []
-text = IntVar()
-img = IntVar()
 rus_l = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 eng_l = 'abcdefghijklmnopqrstuvwxyz'
 eng = ['a', 'b', 'v', 'g', 'd', 'e', 'ye', 'zh', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
        'f', 'kh', 'ts', 'ch', 'sh', 'sh', '', 'y', '', 'e', 'yu', 'ya']
-
-
-def log_write(status, name, **kwargs):
-    link = kwargs.get('link', None)
-    with open('career.csv', 'a', encoding='utf8') as logs:
-        log = csv.writer(logs)
-        if link != '':
-            log.writerow((status, name))
-        else:
-            log.writerow((status, name, link))
-    logs.close()
 
 
 # Translits name for link
@@ -69,7 +42,7 @@ def get_images(html, name):
         front_cover = soup.find('div', class_='span6 center').find('a', class_='gallery').get('href')
         front_cover = front_cover.replace(u'\ufeff', '')
     except AttributeError:
-        log_write("No Front Cover For You :'(", name[:len(name)])
+        log_file("No Front Cover For You :'(", name[:len(name)])
     else:
         urlb.urlretrieve(front_cover,
                          f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/career/{name}/{name}{x}.jpg')
@@ -81,7 +54,7 @@ def get_images(html, name):
         try:
             inside = soup.find('div', class_='span-two-thirds').find_all('img')
         except AttributeError:
-            log_write('NO INSIDES FOR YOU', name)
+            log_file('NO INSIDES FOR YOU', name)
         else:
             insides = []
             for i in inside:
@@ -91,18 +64,6 @@ def get_images(html, name):
                 x += 1
     else:
         urlb.urlretrieve(pdf, f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/career/{name}/{name}{x}.pdf')
-
-
-# Loads file
-def Loadfile():
-    global isbns, filename, filename_name
-    filename1 = filedialog.Open(t, filetypes=[('*.txt files', '.txt')]).show()
-    if filename1 == '':
-        return
-    filename2 = Path(filename1)
-    filename.config(text=filename2.name)
-    filename_name = filename1
-    log_write('File Load Successful', filename2.name)
 
 
 # Writes the info into CSV file
@@ -116,14 +77,6 @@ def csv_read(data):
     file.close()
 
 
-# Gets the HTML from URL
-def get_html(url):
-    r = requests.get(url)
-    r.encoding = 'utf8'
-    log_write('Html Loading Successful', url)
-    return r.text
-
-
 # Gets the info from soup
 def get_head(html, name, link):
     soup = BeautifulSoup(html, 'lxml')
@@ -131,7 +84,7 @@ def get_head(html, name, link):
     try:
         title = soup.find('div', class_='span10').find('h1', class_='title').get_text()
     except AttributeError:
-        log_write(f'ERROR 404 In Text Parse', name[:len(name)], link=link)
+        log_file(f'ERROR 404 In Text Parse', name[:len(name)], link=link)
         return
     info_mass = soup.find('div', class_='span10').get_text()
     isbn_n = info_mass.find('ISBN: ')
@@ -154,77 +107,39 @@ def get_head(html, name, link):
     try:
         description = soup.find('div', class_='span-two-thirds').get_text()
     except AttributeError:
-        log_write('No description for you I guess...', name, link=link)
+        log_file('No description for you I guess...', name, link=link)
         data = {'title': title, 'pagen': page_num, 'ISBN': isbn, 'size': size}
     else:
         pass
         data = {'title': title, 'pagen': page_num, 'ISBN': isbn, 'size': size, 'annotation': description}
     csv_read(data)
-    log_write('Text Parsed', name[:len(name)])
+    log_file('Text Parsed', name[:len(name)])
 
 
-# Returns textimg text img depending on checked CheckButtons
-def get_button_info():
-    global text, img
-    strong = ''
-    if text.get() == 1:
-        strong = strong + 'text'
-    if img.get() == 1:
-        strong = strong + 'img'
-    if strong == '':
-        ms.showerror('NO OPTION SELECTED', 'PLEASE SELECT TEXT, IMAGES OR BOTH!')
-        return 'ERROR'
-    return strong
-
-
-def main():
-    global y
+def career(filename, text_image):
+    names = []
     # Gets info from file
-    with open(filename_name, 'r', encoding='utf8') as file:
+    with open(filename, 'r', encoding='utf8') as file:
         lines = file.readlines()
     file.close()
     for i in lines:
         names.append(i)
     # Checks what is needed
-    if get_button_info() == 'textimg':
+    if text_image == 'textimg':
         for j in range(len(names)):
             name = translit_name(names[j])
             link = f'https://careerpress.ru/book/{name}/'
             link = link.replace(u'\ufeff', '')
-            print(f'{link} {y}')
-            y += 1
-            get_head(get_html(link), name, link)
-            get_images(get_html(link), name)
-    elif get_button_info() == 'text':
+            get_head(get_html(link, name), name, link)
+            get_images(get_html(link, name), name)
+    elif text_image == 'text':
         for j in range(len(names)):
             name = translit_name(names[j])
             link = f'https://careerpress.ru/book/{name}/'
             link = link.replace(u'\ufeff', '')
-            print(f'{link} {y}')
-            y += 1
-            get_head(get_html(link), name, link)
-    elif get_button_info() == 'img':
+            get_head(get_html(link, name), name, link)
+    elif text_image == 'img':
         for j in range(len(names)):
             name = translit_name(names[j])
             link = f'https://careerpress.ru/book/{name}/'
-            print(y)
-            y += 1
             get_images(link, name)
-    else:
-        pass
-    for r in errors:
-        for c in r:
-            print(c, end=" ")
-        print()
-
-
-load_btn = Button(text='Load file', command=Loadfile)
-text_check = Checkbutton(text='Text Part', variable=text, onvalue=1, offvalue=0)
-img_check = Checkbutton(text='Image Part', variable=img, onvalue=1, offvalue=0)
-go_btn = Button(text='Go!', command=main)
-filename.grid(row=0, column=0)
-load_btn.grid(row=0, column=1)
-text_check.grid(row=1, column=1)
-img_check.grid(row=2, column=1)
-go_btn.grid(row=3, column=3)
-t.mainloop()

@@ -2,13 +2,15 @@ from basic_parser_funcs import *
 from ROSMAN.ROSMEN import rosman
 from AST.AST import ast
 from EKSMO.EKSMO import eksmo
+from Career.Career import career
 
 # Important Variables
 filename = ''
-done = ['ROSMAN', 'AST', 'EKSMO']
-format_descriptions = {'ROSMAN': '',
+done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press']
+format_descriptions = {'ROSMAN': 'Format:\n',
                        'AST': 'Format:\n{AST/ASE code},{Book Name}',
-                       'EKSMO': 'Format:\n{AST/ASE code},{Book Name}'
+                       'EKSMO': 'Format:\n{AST/ASE code},{Book Name}',
+                       'Career Press': 'Format:\nBook Names'
                        }
 
 
@@ -35,6 +37,8 @@ def ultra_main():
         ast(filename, text_image)
     elif publisher_use == 'EKSMO':
         eksmo(filename, text_image)
+    elif publisher_use == 'Career Press':
+        career(filename, text_image)
 
 
 def load():
@@ -52,7 +56,7 @@ publisher = StringVar(t)
 publisher.set("No Publisher\nChosen")  # default value
 text = IntVar()
 img = IntVar()
-w = OptionMenu(t, publisher, tuple(done))
+w = OptionMenu(t, publisher, *done)
 filename1 = Label(t, text='NO FILE SELECTED')
 load_btn = Button(text='Load file', command=load)
 text_check = Checkbutton(text='Text Part', variable=text, onvalue=1, offvalue=0)
