@@ -55,25 +55,8 @@ def get_dt(html, name):
             elif tr == 1 and td == 1:
                 description = b[td].text.strip()
                 description = empty_lines(description)
-    print(title)
-    print(pages)
-    print(cover)
-    print(size)
-    print(isbn)
-    print(description)
-    # data = {'title': title, 'pages': pages, 'cover': cover, 'size': size, 'isbn': isbn, 'desc': description}
+    data = {'title': title, 'pages': pages, 'cover': cover, 'size': size, 'isbn': isbn, 'desc': description}
     for i in range(len(insides)):
         Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/rech/{name}').mkdir(parents=True, exist_ok=True)
         urlb.urlretrieve(f'http://www.rech-deti.ru/{insides[i]}', f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser'
                                                                   f'/images/rech/{name}/{i}.jpg')
-
-
-def get_dt2(html):
-    soup = BeautifulSoup(html, 'lxml')
-    print(soup['href'])
-
-
-def get_dt3(html):
-    soup = BeautifulSoup(html, 'lxml')
-    for a in soup.find_all('a', href=True):
-        print(a['href'])

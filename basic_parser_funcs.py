@@ -1,9 +1,7 @@
-from bs4 import BeautifulSoup
 import requests
 from tkinter import *
 from tkinter import filedialog
 import logging as logs
-from tkinter import messagebox as ms
 from pathlib import Path
 logs.basicConfig(filename='ultimate.log', filemode='a', format='%(asctime)s %(levelname)s  %(message)s',
                  datefmt='%d-%b-%y %H:%M:%S', level=logs.DEBUG)
