@@ -1,6 +1,3 @@
-from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox as ms
 from basic_parser_funcs import *
 from ROSMAN.ROSMEN import rosman
 from AST.AST import ast
