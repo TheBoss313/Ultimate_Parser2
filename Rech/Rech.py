@@ -92,7 +92,7 @@ def get_all_rech(html, name):
                                                                   f'/images/rech/{name}/{i}.jpg')
 
 
-def main(filename, text_image):
+def rech(filename, text_image):
     links = []
     names = []
     # Gets info from file

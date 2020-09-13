@@ -3,14 +3,16 @@ from ROSMAN.ROSMEN import rosman
 from AST.AST import ast
 from EKSMO.EKSMO import eksmo
 from Career.Career import career
+from Rech.Rech import rech
 
 # Important Variables
 filename = ''
-done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press']
+done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech']
 format_descriptions = {'ROSMAN': 'Format:\n',
                        'AST': 'Format:\n{AST/ASE code},{Book Name}',
                        'EKSMO': 'Format:\n{AST/ASE code},{Book Name}',
-                       'Career Press': 'Format:\nBook Names'
+                       'Career Press': 'Format:\nBook Names',
+                       'Rech': 'Format:\n{url},{Book Name}'
                        }
 
 
@@ -39,6 +41,8 @@ def ultra_main():
         eksmo(filename, text_image)
     elif publisher_use == 'Career Press':
         career(filename, text_image)
+    elif publisher_use == 'Rech':
+        rech(filename, text_image)
 
 
 def load():
