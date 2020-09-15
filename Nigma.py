@@ -1,50 +1,127 @@
-from bs4 import BeautifulSoup
+from basic_parser_funcs import *
+from text_cleanup import *
+import csv
 
-s = """
-<section class="grid-wrap">
-                
-                <ul class="grid">
-                  <li class="grid-sizer li-sticker"></li>
-                  <li id='gallery-pages-sticker-small' class="li-sticker">
-  <figure>
-    <div class="wrap-img-head">
-      <div class='wrap-cover-img zoom-slide '><img src="https://www.nigmabook.ru/cgi-bin/unishell?usr_data=gd-image(lots,NF0001491,,1,fix-i1_asis-340x214,00000000,)&hide_Cookie=yes" alt="Капитан Сорви-голова. Повесть" title="Капитан Сорви-голова. Повесть"></div>
-    </div>
-  </figure>
-</li><li id='gallery-pages-sticker-small-26' class="li-sticker">
-  <figure>
-    <div class="wrap-img-head">
-      <div class='wrap-cover-img zoom-slide '><img src="https://www.nigmabook.ru/cgi-bin/unishell?usr_data=gd-image(lots,NF0001491,,1,fix-i2_asis-340x214,00000000,)&hide_Cookie=yes" alt="Капитан Сорви-голова. Повесть" title="Капитан Сорви-голова. Повесть"></div>
-    </div>
-  </figure>
-</li><li id='gallery-pages-sticker-small-27' class="li-sticker">
-  <figure>
-    <div class="wrap-img-head">
-      <div class='wrap-cover-img zoom-slide '><img src="https://www.nigmabook.ru/cgi-bin/unishell?usr_data=gd-image(lots,NF0001491,,1,fix-i3_asis-340x214,00000000,)&hide_Cookie=yes" alt="Капитан Сорви-голова. Повесть" title="Капитан Сорви-голова. Повесть"></div>
-    </div>
-  </figure>
-</li><li id='gallery-pages-sticker-small-28' class="li-sticker">
-  <figure>
-    <div class="wrap-img-head">
-      <div class='wrap-cover-img zoom-slide '><img src="https://www.nigmabook.ru/cgi-bin/unishell?usr_data=gd-image(lots,NF0001491,,1,fix-i4_asis-340x214,00000000,)&hide_Cookie=yes" alt="Капитан Сорви-голова. Повесть" title="Капитан Сорви-голова. Повесть"></div>
-    </div>
-  </figure>
-</li><li id='gallery-pages-sticker-small-29' class="li-sticker">
-  <figure>
-    <div class="wrap-img-head">
-      <div class='wrap-cover-img zoom-slide '><img src="https://www.nigmabook.ru/cgi-bin/unishell?usr_data=gd-image(lots,NF0001491,,1,fix-i5_asis-340x214,00000000,)&hide_Cookie=yes" alt="Капитан Сорви-голова. Повесть" title="Капитан Сорви-голова. Повесть"></div>
-    </div>
-  </figure>
-</li><li id='gallery-pages-sticker-small-30' class="li-sticker">
-  <figure>
-    <div class="wrap-img-head">
-      <div class='wrap-cover-img zoom-slide '><img src="https://www.nigmabook.ru/cgi-bin/unishell?usr_data=gd-image(lots,NF0001491,,1,fix-i6_asis-340x214,00000000,)&hide_Cookie=yes" alt="Капитан Сорви-голова. Повесть" title="Капитан Сорви-голова. Повесть"></div>
-    </div>
-  </figure>
-</li><li id='gallery-pages-sticker-small-31' class="li-sticker">
-"""
+rus_l = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+eng_l = 'abcdefghijklmnopqrstuvwxyz'
+eng = ['a', 'b', 'v', 'g', 'd', 'e', 'ye', 'zh', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
+       'f', 'kh', 'ts', 'ch', 'sh', 'sh', '', 'y', '', 'e', 'yu', 'ya']
 
-soup = BeautifulSoup(s, "html.parser")
-p_tag = soup.find("section", class_="grid-wrap")
-for i in p_tag.findAll('img'):
-    print(i.get('src'))
+
+# Translits name for link
+def translit_name(name: str):
+    global eng, rus_l
+    name = name.lower()
+    name = name.replace(' ', '-')
+    name = name.replace('...', '-')
+    name = name.replace('.', '')
+    name = name.replace(',', '')
+    name = name.replace(':', '')
+    end_name = ''
+    for i in range(len(name)):
+        if name[i] == '-':
+            end_name = end_name + '-'
+        elif name[i] in eng_l:
+            end_name = end_name + name[i]
+        elif name[i] in rus_l:
+            a = rus_l.find(name[i])
+            end_name = end_name + eng[a]
+        elif name[i].isdigit():
+            end_name = end_name + name[i]
+    end_name = end_name.replace('--', '-')
+    end_name = end_name.replace('--', '-')
+    return end_name
+
+
+# Gets images
+def get_images(html, name):
+    soup = BeautifulSoup(html, 'lxml')
+    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/career/{name}').mkdir(parents=True, exist_ok=True)
+    p_tag3 = soup.find('div', class_='wrap-img-book').find('img').get('src')
+    p_tag2 = soup.find('section', class_='grid-wrap')
+    p_tag2s = p_tag2.findAll('li')
+    p_tag2s2 = [i.find('img').get('src') for i in p_tag2s[1:]]
+    get_images([p_tag3]+p_tag2s2, 'Nigma', 'Sorvi-Golova', 0)
+
+
+# Writes the info into CSV file
+def csv_read(data):
+    with open("nigma_parsed.csv", 'a', encoding="utf-8")as file:
+        writer = csv.writer(file)
+        try:
+            writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['annotation']))
+        except KeyError:
+            writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size']))
+    file.close()
+
+
+# Gets the info from soup
+def get_head(html, name, link):
+    soup = BeautifulSoup(html, 'lxml')
+    p_tag1 = soup.find('ul', class_='descs-book')
+    ISBN = ''
+    pages = ''
+    size = ''
+    cover = ''
+    for i in p_tag1.findAll('li'):
+        if i.find('span').text in ['Артикул', 'Издатель', 'Авторы', 'Иллюстраторы', 'Год', 'Формат']:
+            pass
+        else:
+            if not i.find('div'):
+                spans = i.findAll('span')
+                string = spans[1].text.strip()
+                string = string.replace(' ', '')
+                string = empty_lines(string).replace('/n', '')
+                if spans[0] == '':
+                    pass
+                elif spans[0].text == 'ISBN':
+                    ISBN = string
+                elif spans[0].text == 'К-во страниц':
+                    pages = string
+                elif spans[0].text == 'Переплет':
+                    cover = string
+            else:
+                if 'Размер (мм)' in i.text:
+                    size = i.text[i.text.find('Размер (мм)') + len('Размер (мм)'):]
+    description = ''
+    try:
+        p_tag4 = soup.find('div', class_='wrap-annotation-book')
+        description = str(p_tag4.find('span')).replace('<br/>', '\n').replace('<span>', '').replace('</span>', '')
+    except AttributeError:
+        log_file('No description for you I guess...', name, link=link)
+        data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size}
+    else:
+        pass
+        data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size, 'annotation': description}
+    csv_read(data)
+    log_file('Text Parsed', name[:len(name)])
+
+
+def nigma(filename, text_image):
+    names = []
+    urls = []
+    # Gets info from file
+    with open(filename, 'r', encoding='utf8') as file:
+        lines = file.readlines()
+    file.close()
+    for i in lines:
+        urls.append(i.split(',')[0])
+        names.append(i.split(',')[1])
+    # Checks what is needed
+    if text_image == 'textimg':
+        for j in range(len(names)):
+            name = translit_name(names[j])
+            link = urls[j]
+            get_head(get_html(link, name), name, link)
+            get_images(get_html(link, name), name)
+    elif text_image == 'text':
+        for j in range(len(names)):
+            name = translit_name(names[j])
+            link = urls[j]
+            link = link.replace(u'\ufeff', '')
+            get_head(get_html(link, name), name, link)
+    elif text_image == 'img':
+        for j in range(len(names)):
+            name = translit_name(names[j])
+            link = urls[j]
+            get_images(link, name)

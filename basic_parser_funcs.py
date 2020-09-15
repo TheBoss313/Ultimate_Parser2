@@ -4,6 +4,7 @@ from tkinter import filedialog
 from tkinter import messagebox as ms
 import logging as logs
 from bs4 import BeautifulSoup
+import urllib.request as urlb
 from pathlib import Path
 logs.basicConfig(filename='ultimate.log', filemode='a', format='%(asctime)s %(levelname)s  %(message)s',
                  datefmt='%d-%b-%y %H:%M:%S', level=logs.DEBUG)
@@ -35,3 +36,11 @@ def log_file(status, name, **kwargs):
         logs.debug(message)
     else:
         logs.info(message)
+
+
+def get_images(links: list, folder_name, file_name, file_number: int = 0):
+    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}').mkdir(parents=True, exist_ok=True)
+    for i in range(file_number, len(links)):
+        print(i)
+        urlb.urlretrieve(links[i],
+                         f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}{i}.jpg')

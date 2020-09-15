@@ -4,15 +4,18 @@ from AST.AST import ast
 from EKSMO.EKSMO import eksmo
 from Career.Career import career
 from Rech.Rech import rech
+from Nigma import nigma
 
 # Important Variables
 filename = ''
-done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech']
+done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma']
 format_descriptions = {'ROSMAN': 'Format:\n',
                        'AST': 'Format:\n{AST/ASE code},{Book Name}',
                        'EKSMO': 'Format:\n{AST/ASE code},{Book Name}',
                        'Career Press': 'Format:\nBook Names',
-                       'Rech': 'Format:\n{url},{Book Name}'
+                       'Rech': 'Format:\n{url},{Book Name}',
+                       'Nigma': 'Format:\n{url},{Book Name}',
+                       'No Publisher\nChosen': ''
                        }
 
 
@@ -43,6 +46,8 @@ def ultra_main():
         career(filename, text_image)
     elif publisher_use == 'Rech':
         rech(filename, text_image)
+    elif publisher_use == 'Nigma':
+        nigma(filename, text_image)
 
 
 def load():
@@ -50,6 +55,12 @@ def load():
     filename = Loadfile()
     loaded = Path(filename).name
     filename1.config(text=loaded)
+
+
+def format_disp():
+    tk = Tk()
+    l1 = Label(tk, text=format_descriptions[publisher.get()])
+    l1.pack()
 
 
 # Tkinter GUI Part
@@ -62,11 +73,11 @@ text = IntVar()
 img = IntVar()
 w = OptionMenu(t, publisher, *done)
 filename1 = Label(t, text='NO FILE SELECTED')
-load_btn = Button(text='Load file', command=load)
-text_check = Checkbutton(text='Text Part', variable=text, onvalue=1, offvalue=0)
-img_check = Checkbutton(text='Image Part', variable=img, onvalue=1, offvalue=0)
-go_btn = Button(text='Go!', command=ultra_main)
-format_b = Button(text='File Input\nFormat')
+load_btn = Button(t, text='Load file', command=load)
+text_check = Checkbutton(t, text='Text Part', variable=text, onvalue=1, offvalue=0)
+img_check = Checkbutton(t, text='Image Part', variable=img, onvalue=1, offvalue=0)
+go_btn = Button(t, text='Go!', command=ultra_main)
+format_b = Button(t, text='File Input\nFormat', command=format_disp)
 filename1.grid(row=0, column=0)
 load_btn.grid(row=0, column=1)
 w.grid(row=1, column=0)
