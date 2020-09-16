@@ -39,16 +39,20 @@ def csv_read(data):
     with open("eksmo_parsed.csv", 'a', encoding="utf-8")as file:
         writer = csv.writer(file)
         try:
-            writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['annotation']))
+            writer.writerow((data['title'], data['isbn'], data['pages'], data['cover'], data['size'], data['desc']))
         except KeyError:
-            writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size']))
+            writer.writerow((data['title'], data['isbn'], data['pages'], data['cover'], data['size']))
     file.close()
 
 
 # Gets the info from soup
-def get_all_rech(html, name):
+def get_all_rech(html, name, link):
     soup = BeautifulSoup(html, 'lxml')
-    a = soup.findAll('table')[1].findAll('tr')
+    a = []
+    try:
+        a = soup.findAll('table')[1].findAll('tr')
+    except IndexError:
+        log_file('WEIRD TABLES', name, link=link)
     insides = []
     title = ''
     pages = 0
@@ -86,6 +90,7 @@ def get_all_rech(html, name):
                 description = b[td].text.strip()
                 description = empty_lines(description)
     data = {'title': title, 'pages': pages, 'cover': cover, 'size': size, 'isbn': isbn, 'desc': description}
+    csv_read(data)
     for i in range(len(insides)):
         Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/rech/{name}').mkdir(parents=True, exist_ok=True)
         urlb.urlretrieve(f'http://www.rech-deti.ru/{insides[i]}', f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser'
@@ -105,5 +110,5 @@ def rech(filename, text_image):
         names.append(sub_tot[1])
     for j in range(len(names)):
         link = links[j]
-        name = names[j]
-        get_all_rech(get_html(link, name), name)
+        name = translit_name(names[j])
+        get_all_rech(get_html(link, name), name, link)
