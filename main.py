@@ -4,7 +4,7 @@ from AST.AST import ast
 from EKSMO.EKSMO import eksmo
 from Career.Career import career
 from Rech.Rech import rech
-from Nigma import nigma
+from Nigma.Nigma import nigma
 
 # Important Variables
 filename = ''
@@ -34,7 +34,7 @@ def get_button_info():
 
 
 def ultra_main():
-    text_image = 0
+    text_image = get_button_info()
     publisher_use = publisher.get()
     if publisher_use == 'ROSMAN':
         rosman(filename, text_image)

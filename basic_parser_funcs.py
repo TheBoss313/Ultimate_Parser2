@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import urllib.request as urlb
 from pathlib import Path
 logs.basicConfig(filename='ultimate.log', filemode='a', format='%(asctime)s %(levelname)s  %(message)s',
-                 datefmt='%d-%b-%y %H:%M:%S', level=logs.DEBUG)
+                 datefmt='%d-%b-%y %H:%M:%S', level=logs.INFO)
 
 
 def get_html(url, name):
@@ -29,18 +29,17 @@ def Loadfile():
 
 def log_file(status, name, **kwargs):
     link = kwargs.get('link', None)
-    message = f'{status}  {name}  {link}'
-    if status != 'HTML Load Successful' or status != 'File Load Successful':
+    message = f'{status} - {name} - {link}'
+    if status != 'HTML Load Successful' or status != 'File Load Successful' or status.lower() != 'info':
         logs.critical(message)
-    elif status.lower() == 'debug':
-        logs.debug(message)
-    else:
+    elif status.lower() == 'info':
         logs.info(message)
+    else:
+        logs.warning(message)
 
 
 def get_images(links: list, folder_name, file_name, file_number: int = 0):
-    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}').mkdir(parents=True, exist_ok=True)
+    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}').mkdir(parents=True, exist_ok=True)
     for i in range(file_number, len(links)):
-        print(i)
         urlb.urlretrieve(links[i],
-                         f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}{i}.jpg')
+                         f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}/{file_name}{i}.jpg')

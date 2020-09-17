@@ -34,14 +34,14 @@ def translit_name(name: str):
 
 
 # Gets images
-def get_images(html, name):
+def get_image(html, name):
     soup = BeautifulSoup(html, 'lxml')
-    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/career/{name}').mkdir(parents=True, exist_ok=True)
+    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/Nigma/{name}').mkdir(parents=True, exist_ok=True)
     p_tag3 = soup.find('div', class_='wrap-img-book').find('img').get('src')
     p_tag2 = soup.find('section', class_='grid-wrap')
     p_tag2s = p_tag2.findAll('li')
     p_tag2s2 = [i.find('img').get('src') for i in p_tag2s[1:]]
-    get_images([p_tag3]+p_tag2s2, 'Nigma', 'Sorvi-Golova', 0)
+    get_images([p_tag3]+p_tag2s2, 'Nigma', name, 0)
 
 
 # Writes the info into CSV file
@@ -64,37 +64,42 @@ def get_head(html, name, link):
     size = ''
     cover = ''
     for i in p_tag1.findAll('li'):
-        if i.find('span').text in ['Артикул', 'Издатель', 'Авторы', 'Иллюстраторы', 'Год', 'Формат']:
-            pass
+        try:
+            i.find('span').text
+        except AttributeError:
+            log_file('Critical', 'Nigma Empty Span')
         else:
-            if not i.find('div'):
-                spans = i.findAll('span')
-                string = spans[1].text.strip()
-                string = string.replace(' ', '')
-                string = empty_lines(string).replace('/n', '')
-                if spans[0] == '':
-                    pass
-                elif spans[0].text == 'ISBN':
-                    ISBN = string
-                elif spans[0].text == 'К-во страниц':
-                    pages = string
-                elif spans[0].text == 'Переплет':
-                    cover = string
+            if i.find('span').text in ['Артикул', 'Издатель', 'Авторы', 'Иллюстраторы', 'Год', 'Формат']:
+                pass
             else:
-                if 'Размер (мм)' in i.text:
-                    size = i.text[i.text.find('Размер (мм)') + len('Размер (мм)'):]
-    description = ''
-    try:
-        p_tag4 = soup.find('div', class_='wrap-annotation-book')
-        description = str(p_tag4.find('span')).replace('<br/>', '\n').replace('<span>', '').replace('</span>', '')
-    except AttributeError:
-        log_file('No description for you I guess...', name, link=link)
-        data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size}
-    else:
-        pass
-        data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size, 'annotation': description}
-    csv_read(data)
-    log_file('Text Parsed', name[:len(name)])
+                if not i.find('div'):
+                    spans = i.findAll('span')
+                    string = spans[1].text.strip()
+                    string = string.replace(' ', '')
+                    string = empty_lines(string).replace('/n', '')
+                    if spans[0] == '':
+                        pass
+                    elif spans[0].text == 'ISBN':
+                        ISBN = string
+                    elif spans[0].text == 'К-во страниц':
+                        pages = string
+                    elif spans[0].text == 'Переплет':
+                        cover = string
+                else:
+                    if 'Размер (мм)' in i.text:
+                        size = i.text[i.text.find('Размер (мм)') + len('Размер (мм)'):]
+        description = ''
+        try:
+            p_tag4 = soup.find('div', class_='wrap-annotation-book')
+            description = str(p_tag4.find('span')).replace('<br/>', '\n').replace('<span>', '').replace('</span>', '')
+        except AttributeError:
+            log_file('No description for you I guess...', name, link=link)
+            data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size}
+        else:
+            pass
+            data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size, 'annotation': description}
+        csv_read(data)
+        log_file('Text Parsed', name[:len(name)])
 
 
 def nigma(filename, text_image):
@@ -113,7 +118,7 @@ def nigma(filename, text_image):
             name = translit_name(names[j])
             link = urls[j]
             get_head(get_html(link, name), name, link)
-            get_images(get_html(link, name), name)
+            get_image(get_html(link, name), name)
     elif text_image == 'text':
         for j in range(len(names)):
             name = translit_name(names[j])
@@ -124,4 +129,4 @@ def nigma(filename, text_image):
         for j in range(len(names)):
             name = translit_name(names[j])
             link = urls[j]
-            get_images(link, name)
+            get_image(get_html(link, name), name)
