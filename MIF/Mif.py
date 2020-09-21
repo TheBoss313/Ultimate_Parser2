@@ -37,11 +37,14 @@ def translit_name(name: str):
 def get_image(html, name):
     soup = BeautifulSoup(html, 'lxml')
     Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/Nigma/{name}').mkdir(parents=True, exist_ok=True)
-    p_tag3 = soup.find('div', class_='wrap-img-book').find('img').get('src')
-    p_tag2 = soup.find('section', class_='grid-wrap')
-    p_tag2s = p_tag2.findAll('li')
-    p_tag2s2 = [i.find('img').get('src').replace('-340x214', '').replace('fix-', '') for i in p_tag2s[1:]]
-    get_images([p_tag3]+p_tag2s2, 'Nigma', name, 0)
+    cover = soup.find('div', class_='img-wrapper').find('img').get('src')
+    cover = ('https://www.mann-ivanov-ferber.ru'+cover).replace('1.00x', '2.00x')
+    get_images([cover], 'Mif', name, 0)
+    pdf = soup.find('div', class_='img-wrap').find('a').get('modal-params')
+    pdf = pdf[pdf.find('https:'):pdf.find('.pdf')+4].replace('_stamped', '')
+    get_pdf(pdf, 'Mif', name, 1)
+    pdf2 = soup.find('div', class_='nkk-file-download').find('a').get('href').replace('_stamped', '')
+    get_pdf(pdf2, 'Mif', name, 2)
 
 
 # Writes the info into CSV file
@@ -58,51 +61,15 @@ def csv_read(data):
 # Gets the info from soup
 def get_head(html, name, link):
     soup = BeautifulSoup(html, 'lxml')
-    p_tag1 = soup.find('ul', class_='descs-book')
+    p_tag1 = soup.find('div', class_="content")
     ISBN = ''
     pages = ''
     size = ''
     cover = ''
-    for i in p_tag1.findAll('li'):
-        try:
-            i.find('span').text
-        except AttributeError:
-            log_file('Critical', 'Nigma Empty Span')
-        else:
-            if i.find('span').text in ['Артикул', 'Издатель', 'Авторы', 'Иллюстраторы', 'Год', 'Формат']:
-                pass
-            else:
-                if not i.find('div'):
-                    spans = i.findAll('span')
-                    string = spans[1].text.strip()
-                    string = string.replace(' ', '')
-                    string = empty_lines(string).replace('/n', '')
-                    if spans[0] == '':
-                        pass
-                    elif spans[0].text == 'ISBN':
-                        ISBN = string
-                    elif spans[0].text == 'К-во страниц':
-                        pages = string
-                    elif spans[0].text == 'Переплет':
-                        cover = string
-                else:
-                    if 'Размер (мм)' in i.text:
-                        size = i.text[i.text.find('Размер (мм)') + len('Размер (мм)'):]
-        description = ''
-        try:
-            p_tag4 = soup.find('div', class_='wrap-annotation-book')
-            description = str(p_tag4.find('span')).replace('<br/>', '\n').replace('<span>', '').replace('</span>', '')
-        except AttributeError:
-            log_file('No description for you I guess...', name, link=link)
-            data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size}
-        else:
-            pass
-            data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size, 'annotation': description}
-        csv_read(data)
-        log_file('Text Parsed', name[:len(name)])
+    print(p_tag1)
 
 
-def nigma(filename, text_image):
+def mif(filename, text_image):
     names = []
     urls = []
     # Gets info from file

@@ -1,3 +1,5 @@
+import webbrowser
+
 import requests
 from tkinter import *
 from tkinter import filedialog
@@ -43,3 +45,9 @@ def get_images(links: list, folder_name, file_name, file_number: int = 0):
     for i in range(file_number, len(links)):
         urlb.urlretrieve(links[i],
                          f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}/{file_name}{i}.jpg')
+
+
+def get_pdf(link: str, folder_name, file_name, file_number: int = 0):
+    Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}').mkdir(parents=True, exist_ok=True)
+    urlb.urlretrieve(link,
+                     f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}/{file_name}{file_number}.pdf')
