@@ -1,11 +1,10 @@
 from basic_parser_funcs import *
-from text_cleanup import *
 import csv
 
 rus_l = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 eng_l = 'abcdefghijklmnopqrstuvwxyz'
 eng = ['a', 'b', 'v', 'g', 'd', 'e', 'ye', 'zh', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
-       'f', 'kh', 'ts', 'ch', 'sh', 'sh', '', 'y', '', 'e', 'yu', 'ya']
+       'f', 'h', 'ts', 'ch', 'sh', 'shh', '', 'y', '', 'e', 'yu', 'ya']
 
 
 # Translits name for link
@@ -38,13 +37,16 @@ def get_image(html, name):
     soup = BeautifulSoup(html, 'lxml')
     Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/Nigma/{name}').mkdir(parents=True, exist_ok=True)
     cover = soup.find('div', class_='img-wrapper').find('img').get('src')
-    cover = ('https://www.mann-ivanov-ferber.ru'+cover).replace('1.00x', '2.00x')
+    cover = ('https://www.mann-ivanov-ferber.ru' + cover).replace('1.00x', '2.00x')
     get_images([cover], 'Mif', name, 0)
-    pdf = soup.find('div', class_='img-wrap').find('a').get('modal-params')
-    pdf = pdf[pdf.find('https:'):pdf.find('.pdf')+4].replace('_stamped', '')
-    get_pdf(pdf, 'Mif', name, 1)
-    pdf2 = soup.find('div', class_='nkk-file-download').find('a').get('href').replace('_stamped', '')
-    get_pdf(pdf2, 'Mif', name, 2)
+    try:
+        insides = ['https://www.mann-ivanov-ferber.ru/' + i.find('img').get('hires-src') for i in soup.find('section',
+                                id='imageslist').find('div', class_='slider-pane').find_all('div', class_='slider-item')]
+        get_images(insides, 'Mif', name, 1)
+    except AttributeError:
+        pdf = soup.find('div', class_='img-wrap').find('a').get('modal-params')
+        pdf = pdf[pdf.find('https:'):pdf.find('.pdf')+4].replace('_stamped', '')
+        get_pdf(pdf, 'Mif', name, 1)
 
 
 # Writes the info into CSV file
@@ -71,22 +73,24 @@ def get_head(html, name, link):
 
 def mif(filename, text_image):
     names = []
-    urls = []
     # Gets info from file
     with open(filename, 'r', encoding='utf8') as file:
         lines = file.readlines()
     file.close()
     for i in lines:
-        urls.append(i.split(',')[0])
-        names.append(i.split(',')[1])
+        names.append(translit_name(i))
     # Checks what is needed
     if text_image == 'textimg':
+        ms.showerror('Development', 'Info parser is still under development.\nOnly images available.')
+        return
         for j in range(len(names)):
             name = translit_name(names[j])
             link = urls[j]
             get_head(get_html(link, name), name, link)
             get_image(get_html(link, name), name)
     elif text_image == 'text':
+        ms.showerror('Development', 'Info parser is still under development.\nOnly images available.')
+        return
         for j in range(len(names)):
             name = translit_name(names[j])
             link = urls[j]
@@ -94,6 +98,6 @@ def mif(filename, text_image):
             get_head(get_html(link, name), name, link)
     elif text_image == 'img':
         for j in range(len(names)):
-            name = translit_name(names[j])
-            link = urls[j]
+            name = names[j]
+            link = f'https://www.mann-ivanov-ferber.ru/books/{name}/'
             get_image(get_html(link, name), name)

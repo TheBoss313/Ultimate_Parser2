@@ -5,16 +5,18 @@ from EKSMO.EKSMO import eksmo
 from Career.Career import career
 from Rech.Rech import rech
 from Nigma.Nigma import nigma
+from MIF.Mif import mif
 
 # Important Variables
 filename = ''
-done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma']
+done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma', 'Mif']
 format_descriptions = {'ROSMAN': 'Format:\n',
                        'AST': 'Format:\n{AST/ASE code},{Book Name}',
                        'EKSMO': 'Format:\n{AST/ASE code},{Book Name}',
                        'Career Press': 'Format:\nBook Names',
                        'Rech': 'Format:\n{url},{Book Name}',
                        'Nigma': 'Format:\n{url},{Book Name}',
+                       'Mif': 'Format\n{name}',
                        'No Publisher\nChosen': ''
                        }
 
@@ -48,6 +50,8 @@ def ultra_main():
         rech(filename, text_image)
     elif publisher_use == 'Nigma':
         nigma(filename, text_image)
+    elif publisher_use == 'Mif':
+        mif(filename, text_image)
 
 
 def load():
