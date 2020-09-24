@@ -36,7 +36,7 @@ def translit_name(name: str):
 
 # Writes the info into CSV file
 def csv_read(data):
-    with open("eksmo_parsed.csv", 'a', encoding="utf-8")as file:
+    with open(r"csvs\rech_parsed.csv", 'a', encoding="utf-8")as file:
         writer = csv.writer(file)
         try:
             writer.writerow((data['title'], data['isbn'], data['pages'], data['cover'], data['size'], data['desc']))

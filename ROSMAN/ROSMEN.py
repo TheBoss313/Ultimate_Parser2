@@ -1,6 +1,5 @@
 import csv
 from basic_parser_funcs import *
-from ftp_parser_rosman import main_ftp
 
 rus_l = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 eng_l = 'abcdefghijklmnopqrstuvwxyz'
@@ -34,7 +33,7 @@ def translit_name(name: str):
 
 # Writes the info into CSV file
 def csv_read(data):
-    with open("rosman_parsed.csv", 'a', encoding="utf-8")as file:
+    with open(r"csvs\rosman_parsed.csv", 'a', encoding="utf-8")as file:
         writer = csv.writer(file)
         writer.writerow((data['name'], data['annotation']))
 
@@ -53,35 +52,37 @@ def get_head(html, name):
         csv_read(data)
 
 
+def get_image(html, name):
+    pass
+
+
 def rosman(filename, button_info):
-    y = 0
     names = []
+    links = []
     # Gets info from file
     with open(filename, 'r', encoding='utf8') as file:
         lines = file.readlines()
     file.close()
     for line in lines:
+        links.append(line.split(',', 1)[0])
         names.append(line.split(',', 1)[1])
     # Checks what is needed
     if button_info == 'textimg':
         for j in range(len(names)):
             name = names[j]
             link = f'https://www.rosman.ru/catalog/item/{translit_name(name)}/'
-            print(f'{link} {y}')
-            y += 1
             hatmail = get_html(link, name)
-            main_ftp(lines)
+            get_image(hatmail, name)
             get_head(hatmail, name)
     elif button_info == 'text':
         for j in range(len(names)):
             name = names[j]
             link = f'https://www.rosman.ru/catalog/item/{translit_name(name)}/'
-            print(f'{link} {y}')
-            y += 1
             hatmail = get_html(link, name)
             get_head(hatmail, name)
     elif button_info == 'img':
         for j in range(len(names)):
-            print(y)
-            y += 1
-            main_ftp(lines)
+            link = links[j]
+            name = names[j]
+            hatmail = get_html(link, name)
+            get_image(hatmail, name)

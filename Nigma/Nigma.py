@@ -46,7 +46,7 @@ def get_image(html, name):
 
 # Writes the info into CSV file
 def csv_read(data):
-    with open("nigma_parsed.csv", 'a', encoding="utf-8")as file:
+    with open(r"csvs\nigma_parsed.csv", 'a', encoding="utf-8")as file:
         writer = csv.writer(file)
         try:
             writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['annotation']))

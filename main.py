@@ -6,10 +6,11 @@ from Career.Career import career
 from Rech.Rech import rech
 from Nigma.Nigma import nigma
 from MIF.Mif import mif
+from Melik.Melik import melik
 
 # Important Variables
 filename = ''
-done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma', 'Mif']
+done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma', 'Mif', 'Melik']
 format_descriptions = {'ROSMAN': 'Format:\n',
                        'AST': 'Format:\n{AST/ASE code},{Book Name}',
                        'EKSMO': 'Format:\n{AST/ASE code},{Book Name}',
@@ -17,6 +18,7 @@ format_descriptions = {'ROSMAN': 'Format:\n',
                        'Rech': 'Format:\n{url},{Book Name}',
                        'Nigma': 'Format:\n{url},{Book Name}',
                        'Mif': 'Format\n{name}',
+                       'Melik': 'Format\n{url},{name}',
                        'No Publisher\nChosen': ''
                        }
 
@@ -52,6 +54,8 @@ def ultra_main():
         nigma(filename, text_image)
     elif publisher_use == 'Mif':
         mif(filename, text_image)
+    elif publisher_use == 'Melik':
+        melik(filename, text_image)
 
 
 def load():

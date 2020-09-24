@@ -19,6 +19,10 @@ def get_html(url, name):
     return r.text
 
 
+def get_file_ext(url):
+    return url[url.rfind('.')+1:]
+
+
 def Loadfile():
     tk = Tk()
     filename = filedialog.Open(tk, filetypes=[('*.txt files', '.txt')]).show()
@@ -45,7 +49,7 @@ def get_images(links: list, folder_name, file_name, file_number: int = 0):
     for i in range(file_number, len(links)):
         urlb.urlretrieve(links[i],
                          f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/'
-                         f'{folder_name}/{file_name}/{file_name}{i}.jpg')
+                         f'{folder_name}/{file_name}/{file_name}{i}.{get_file_ext(links[i])}')
 
 
 def get_pdf(link: str, folder_name, file_name, file_number: int = 0):
