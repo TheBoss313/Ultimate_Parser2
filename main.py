@@ -43,7 +43,7 @@ def ultra_main():
     text_image = get_button_info()
     publisher_use = publisher.get()
     if publisher_use == 'ROSMAN':
-        rosman(filename, text_image)
+        rosman(filename, text_image, t)
     elif publisher_use == 'AST':
         ast(filename, text_image)
     elif publisher_use == 'EKSMO':

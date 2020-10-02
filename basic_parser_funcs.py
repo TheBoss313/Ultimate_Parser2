@@ -1,9 +1,10 @@
 import webbrowser
-
+from tkinter import simpledialog as sd
 import requests
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox as ms
+from URL_Validator import *
 import logging as logs
 from bs4 import BeautifulSoup
 import urllib.request as urlb
@@ -15,7 +16,7 @@ logs.basicConfig(filename='ultimate.log', filemode='a', format='%(asctime)s %(le
 def get_html(url, name):
     r = requests.get(url)
     r.encoding = 'utf8'
-    log_file('HTML Load Successful', name)
+    log_file('HTML Load Successful', name, link=url)
     return r.text
 
 
@@ -56,3 +57,7 @@ def get_pdf(link: str, folder_name, file_name, file_number: int = 0):
     Path(f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}').mkdir(parents=True, exist_ok=True)
     urlb.urlretrieve(link,
                      f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/{folder_name}/{file_name}/{file_name}{file_number}.pdf')
+
+
+def ask_for_manual_url(name, tk):
+    return sd.askstring("Manual Url", f"Url of {name}", parent=tk)
