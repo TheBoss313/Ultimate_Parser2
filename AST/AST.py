@@ -17,6 +17,7 @@ def get_images(code: str, name1: str):
     front_cover = f'https://cdn.ast.ru/v2/{code}/COVER/cover1__w600.jpg'
     back_cover = f'https://cdn.ast.ru/v2/{code}/COVER/cover4__w600.jpg'
     pdf = f'https://cdn.eksmo.ru/v2/{code}/PDF/{code}.pdf'
+    print(front_cover)
     try:
         urlb.urlretrieve(front_cover, f'C:/Users/Vlad/PycharmProjects/Ultimate_Parser/images/ast/{name}/{name}{x}.jpg')
         x += 1
@@ -62,7 +63,10 @@ def translit_name(name: str):
 def csv_read(data):
     with open(r"csvs\ast_parsed.csv", 'a', encoding="utf-8")as file:
         writer = csv.writer(file)
-        writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['weight'], data['annotation']))
+        try:
+            writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['weight'], data['annotation']))
+        except KeyError:
+                writer.writerow((data['title'], data['ISBN'], data['pagen'], data['size'], data['annotation']))
 
 
 # Gets the info from soup

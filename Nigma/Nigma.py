@@ -111,7 +111,7 @@ def nigma(filename, text_image):
     file.close()
     for i in lines:
         urls.append(i.split(',')[0])
-        names.append(i.split(',')[1])
+        names.append(i.split(',' ,1)[1])
     # Checks what is needed
     if text_image == 'textimg':
         for j in range(len(names)):

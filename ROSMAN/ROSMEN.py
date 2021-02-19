@@ -64,13 +64,12 @@ def get_image(html, name, tk):
     imgs = soup.find('div', class_='item-pic-pre')
     links = ['https://rosman.ru'+i.get('id') for i in imgs.find_all('div', 'item-pic-pre-one')]
     links = [i.replace('resize_cache/', '').replace('700_700_1/', '') for i in links]
-    get_images(links, 'Rosman', 'name', 0)
+    get_images(links, 'Rosman', name1, 0)
     log_file('Images Parsed', name1)
 
 
 def rosman(filename, button_info, tk):
     names = []
-    links = []
     # Gets info from file
     with open(filename, 'r', encoding='utf8') as file:
         lines = file.readlines()
