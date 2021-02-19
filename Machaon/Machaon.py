@@ -6,20 +6,13 @@ eng = ['a', 'b', 'v', 'g', 'd', 'e', 'ye', 'zh', 'z', 'i', 'y', 'k', 'l', 'm', '
        'f', 'kh', 'ts', 'ch', 'sh', 'shch', '', 'y', '', 'e', 'yu', 'ya']
 
 
-def url_magnify(link: str):
-    i_bock_loc = link.find('iblock/')
-    modif = link[i_bock_loc+7:i_bock_loc+10]
-    for_removal = link[i_bock_loc+11:link.find(modif, i_bock_loc+11)]
-    return link.replace('//', 'https://').replace('resize_cache/', '').replace(':443', '').replace(for_removal, '')
-
-
 # Gets images
 def get_image(html, name):
     soup = BeautifulSoup(html, 'lxml')
     maged_urls = []
     for i in soup.find_all('div', class_='_9XL-sKqTDl'):
         brewed_url = i.find('img').get('src')
-        magnified_url = url_magnify(brewed_url)
+        magnified_url = url_magnify_iblock(brewed_url)
         maged_urls.append(magnified_url)
     get_images(maged_urls, 'Machaon', name, 0, '')
 

@@ -121,3 +121,10 @@ def get_pdf(link: str, folder_name, file_name, file_number: int = 0):
 
 def ask_for_manual_url(name, tk):
     return sd.askstring("Manual Url", f"Url of {name}", parent=tk)
+
+
+def url_magnify_iblock(link: str):
+    i_bock_loc = link.find('iblock/')
+    modif = link[i_bock_loc + 7:i_bock_loc + 10]
+    for_removal = link[i_bock_loc + 11:link.find(modif, i_bock_loc + 11)]
+    return link.replace('//', 'https://').replace('resize_cache/', '').replace(':443', '').replace(for_removal, '')

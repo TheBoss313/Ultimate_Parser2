@@ -11,10 +11,12 @@ from Melik.Melik import melik
 from SmileDecor.Smile import smile
 from Strekoza.Strekoza import strekoza
 from Machaon.Machaon import machaon
+from Piter.Piter import piter
 
 # Important Variables
 filename = ''
-done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma', 'Mif', 'Melik', 'Smile Decor', 'Strekoza', 'Machaon Incomplete']
+done = ['ROSMAN', 'AST', 'EKSMO', 'Career Press', 'Rech', 'Nigma', 'Mif', 'Melik', 'Smile Decor', 'Strekoza',
+        'Machaon Incomplete', "Piter Incomplete"]
 format_descriptions = {'ROSMAN': 'Format:\nName',
                        'AST': 'Format:\n{AST/ASE code},{Book Name}',
                        'EKSMO': 'Format:\n{AST/ASE code},{Book Name}',
@@ -26,6 +28,7 @@ format_descriptions = {'ROSMAN': 'Format:\nName',
                        'Smile Decor': 'Format:\n{url},{name}',
                        'Strekoza': 'Format:\n{name}',
                        'Machaon Incomplete': 'Incomplete, images only',
+                       'Piter Incomplete': 'Incomplete Images only\nURL before ? or integer code',
                        'No Publisher\nChosen': ''
                        }
 
@@ -68,7 +71,9 @@ def ultra_main():
     elif publisher_use == 'Strekoza':
         strekoza(filename, text_image)
     elif publisher_use == 'Machaon Incomplete':
-        machaon(filename, 'img')# !!!TODO: EDIT TO TEXT_IMAGE LEATER WHEN TEXT IS DONE...
+        machaon(filename, 'img')  # !!!TODO: EDIT TO TEXT_IMAGE LEATER WHEN TEXT IS DONE...
+    elif publisher_use == 'Piter Incomplete':
+        piter(filename, 'img')  # !!!TODO: EDIT TO TEXT_IMAGE WHEN TEXT IS DONE...
     print(f"FINISHED DOWNLOADING ALL {publisher_use} books.")
     if sleep_var.get():
         os.system('rundll32.exe powrprof.dll,SetSuspendState 0,1,0')

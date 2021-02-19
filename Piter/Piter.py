@@ -1,27 +1,26 @@
 from basic_parser_funcs import *
-from text_cleanup import *
 import csv
+from time import time
 
 eng = ['a', 'b', 'v', 'g', 'd', 'e', 'ye', 'zh', 'z', 'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
        'f', 'kh', 'ts', 'ch', 'sh', 'shch', '', 'y', '', 'e', 'yu', 'ya']
 
 
-def url_magnify(link: str):
-    i_bock_loc = link.find('iblock/')
-    modif = link[i_bock_loc+7:i_bock_loc+10]
-    for_removal = link[i_bock_loc+11:link.find(modif, i_bock_loc+11)]
-    return link.replace('//', 'https://').replace('resize_cache/', '').replace(':443', '').replace(for_removal, '')
-
-
 # Gets images
 def get_image(html, name):
     soup = BeautifulSoup(html, 'lxml')
-    maged_urls = []
-    for i in soup.find_all('div', class_='_9XL-sKqTDl'):
-        brewed_url = i.find('img').get('src')
-        magnified_url = url_magnify(brewed_url)
-        maged_urls.append(magnified_url)
-    get_images(maged_urls, 'Machaon', name, 0, '')
+    title = soup.find("div", class_="photo").find("img").get("src")
+    maged_urls = [title]
+    test = soup.find('div', class_='product-links').find_all("a")
+    for i in test:
+        brewed_url = i.get('href')
+        if "iblock" in brewed_url:
+            magnified_url = url_magnify_iblock(brewed_url)
+            maged_urls.append(magnified_url)
+        else:
+            maged_urls.append(brewed_url)
+    get_images(maged_urls, 'Piter', name, 0, '')
+    print(f"FINISHED DOWNLOADING {name}")
 
 
 # Writes the info into CSV file
@@ -38,31 +37,10 @@ def csv_read(data):
 # Gets the info from soup
 def get_head(html, name, link):
     soup = BeautifulSoup(html, 'lxml')
-    title = soup.find('h1', class_='VKrmQXOtBg')
-    print(soup.find('div', class_='_19tSXSSOSx'))
-    print(soup.select_one('._1YUztduJR8'))
-    '''
-    tag = soup.find('div', class_='_19tSXSSOSx').find_all('div', class_='_1YUztduJR8')
-    ISBN = tag[4]
-    pages = tag[2]
-    size = tag[3]
-    cover = tag[1]
-    try:
-        p_tag4 = soup.find('div', class_='wth2ozwagb')
-        description = str(p_tag4.find('p')).replace('<br/>', '\n').replace('<span>', '').replace('</span>', '')
-    except AttributeError:
-        log_file('No description for you I guess...', name, link=link)
-        data = {'title': title, 'pagen': pages, 'ISBN': ISBN, 'size': size, 'cover': cover}
-    else:
-        pass
-        data = {'title': name, 'pagen': pages, 'ISBN': ISBN, 'size': size, 'annotation': description, 'cover': cover}
-    print(data)
-    # csv_read(data)
-    # log_file('Text Parsed', name[:len(name)])'''
 
 
-def machaon(filename, text_image):
-    print("Starting Machaon Download")
+def piter(filename, text_image):
+    print("Starting Piter Download")
     names = []
     # Gets info from file
     with open(filename, 'r', encoding='utf8') as file:
@@ -74,18 +52,21 @@ def machaon(filename, text_image):
     if text_image == 'textimg':
         for j in range(len(names)):
             name = translit_name2(names[j], eng)
-            #link = 'https://azbooka.ru/books/' + names[j]
-            #get_head(get_html(link, name), name, link)
-            #get_image(get_html(link, name), name)
+            # link = 'https://azbooka.ru/books/' + names[j]
+            # get_head(get_html(link, name), name, link)
+            # get_image(get_html(link, name), name)
     elif text_image == 'text':
         for j in range(len(names)):
             name = translit_name2(names[j], eng)
-            #link = 'https://azbooka.ru/books/' + names[j]
-            #get_head(get_html(link, name), name, link)
+            # link = 'https://azbooka.ru/books/' + names[j]
+            # get_head(get_html(link, name), name, link)
     elif text_image == 'img':
         for j in range(len(names)):
             name = translit_name2(names[j], eng)
             print(name)
-            link = 'https://azbooka.ru/books/' + name
+            if name.startswith("https:\\"):
+                link = name
+            else:
+                link = 'https://www.piter.com/product_by_id/' + name
             print(link)
             get_image(get_html(link, name), name)
